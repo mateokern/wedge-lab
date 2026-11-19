@@ -2,7 +2,7 @@ WEDGE LAB — FIRST WORKING VERSION
 
 QUICK TEST
 - Open index.html in a desktop browser.
-- Select Practice > 90–135 yd > Start 20 shots.
+- Select Practice > 30–75 yd (or 50–90, 90–135, Custom) > Start 20 shots.
 - Enter each FlightScope result manually (left/right/long/short or carry and offline).
 - Open Analysis and Sessions when you finish.
 - Settings > Import screenshot combine imports your supplied 90–135 yard round (71.0).
@@ -17,6 +17,8 @@ MAKE IT A FREE IPHONE HOME-SCREEN WEB APP (GITHUB PAGES)
 6. Before entering important data, use the home-screen app as your permanent entry point, and export a JSON backup regularly.
 
 IMPORTANT LIMITATIONS
+- New practice sessions record ball model as Mixed premium automatically; the dropdown was removed. Existing ball data in saved sessions and JSON/CSV backups remains intact.
+- No multi-player cloud leaderboard yet: different browsers/devices cannot see each other's results. A future team mode would need a shared database.
 - First version has manual FlightScope entry; no direct FlightScope integration.
 - No cloud sync. Data is saved separately in each browser/app installation using local storage.
 - Clearing app/site data, private browsing, or removing the app may erase local data.
