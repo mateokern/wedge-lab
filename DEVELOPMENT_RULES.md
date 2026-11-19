@@ -11,3 +11,10 @@ These are standing requirements for all future Wedge Lab updates.
 7. Verify the published site on phone/tablet as well as desktop after major changes. Keep a rollback route.
 
 Owner preference: LIU-inspired baby blue and gold visual design with clear navy text.
+
+
+Team Mode additional safeguards:
+- Never bulk-upload historical personal sessions into the team database.
+- Never treat a teammate-name dropdown as sufficient access control. Keep verified-email allowlisting and server row-level security.
+- Never expose service-role credentials, roster emails, or personal auth tokens in this public repository.
+- Test team uploads, score edits, removal, denied access, and offline recovery before inviting the team.
