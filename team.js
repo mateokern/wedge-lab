@@ -224,4 +224,15 @@ function onEdited(id){const s=data.sessions.find(x=>x.id===id);if(!s||!s.teamMem
 function enter(){if(state.auth&&configReady()){refresh().then(()=>syncPending(false));}}
 window.WedgeTeam={init,render,action,onChange,enter,onFinished,onEdited,deleteTeamSession,
  member:function(){return state.member;}, configured:configReady};
+/* Refresh while the Team screen is open; queued offline results retry safely.
+   No network polling during personal practice or while the app is hidden. */
+if(typeof window.setInterval==='function')window.setInterval(function(){
+ if(typeof ui!=='undefined'&&ui.view==='team'&&state.member&&!state.refreshing
+    &&(typeof document==='undefined'||document.visibilityState!=='hidden')){
+   refresh().then(function(){return syncPending(false);}).catch(function(){});
+ }
+},60000);
+if(typeof window.addEventListener==='function')window.addEventListener('online',function(){
+ if(state.member)refresh().then(function(){return syncPending(true);}).catch(function(){});
+});
 })();
