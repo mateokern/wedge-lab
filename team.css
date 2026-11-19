@@ -1,0 +1,15 @@
+/* LIU Team Mode — additive only. Does not modify existing solo UI styles. */
+.team-top{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.7fr);gap:18px;margin:18px 0}
+.team-intro{background:linear-gradient(130deg,#d1efff,#fff8e3)}
+.team-intro p{color:#365e79}
+.team-top .stat{box-shadow:none}
+@media(max-width:780px){
+  .mobilenav{grid-template-columns:repeat(6,1fr)}
+  .mobilenav button{font-size:9px}
+  .mobilenav button span{font-size:19px}
+  .team-top{grid-template-columns:1fr}
+}
+@media(max-width:360px){
+ .mobilenav button{font-size:8px}
+ .mobilenav button span{font-size:17px}
+}
