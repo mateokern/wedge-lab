@@ -12,7 +12,7 @@ function configReady(){return /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(Str
 function h(value){return esc(value);}
 function storeAuth(){try{if(state.auth)localStorage.setItem(AUTH_KEY,JSON.stringify(state.auth));else localStorage.removeItem(AUTH_KEY);}catch(e){}}
 function restoreAuth(){try{const a=JSON.parse(localStorage.getItem(AUTH_KEY));if(a&&a.access_token&&a.refresh_token)state.auth=a;}catch(e){}}
-function paint(){if(ui.view==='team')render();}
+function paint(){if(typeof ui!=='undefined'&&ui.view==='team'&&typeof window.render==='function')window.render();}
 function message(err){state.error=typeof err==='string'?err:(err?.message||'Something went wrong.');state.notice='';paint();}
 async function request(path,method,body,needAuth,extraHeaders){
  if(!configReady())throw Error('Team database is not connected yet.');
@@ -38,10 +38,10 @@ async function accessToken(){
 }
 async function loadRoster(){
  if(!state.auth)return;
- const roster=await request('/rest/v1/wedge_team_members?select=id,email,display_name&active=eq.true&order=display_name.asc');
+ const myId=await request('/rest/v1/rpc/wedge_team_my_id','POST',{});
+ const roster=await request('/rest/v1/wedge_team_members?select=id,display_name&active=eq.true&order=display_name.asc');
  state.members=Array.isArray(roster)?roster:[];
- const email=String(state.auth.email||'').trim().toLowerCase();
- state.member=state.members.find(p=>p.email===email)||null;
+ state.member=state.members.find(p=>p.id===myId)||null;
  if(!state.member){
    state.notice='This email is not on the LIU team roster yet. Ask the team organizer to add it.';
    state.sessions=[];state.loaded=false;return;
@@ -108,7 +108,7 @@ function computeLeaderboard(){
  }
  return [...byId.values()].map(p=>{
   const chronological=p.scores.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
-  return {...p,count:p.scores.length,best:p.count===0?null:Math.min(...p.scores.map(s=>s.score)),
+  return {...p,count:p.scores.length,
    last5:p.scores.length?p.scores.slice(0,5).reduce((a,b)=>a+b.score,0)/Math.min(5,p.scores.length):null};
  }).map(p=>({...p,best:p.scores.length?Math.min(...p.scores.map(s=>s.score)):null}))
  .sort((a,b)=>(a.best??Infinity)-(b.best??Infinity)||(a.last5??Infinity)-(b.last5??Infinity)||a.display_name.localeCompare(b.display_name));
