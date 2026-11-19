@@ -78,7 +78,13 @@ create table if not exists public.wedge_team_sessions (
  shots jsonb not null,
  score double precision generated always as (public.wedge_team_score(shots)) stored,
  created_at timestamptz not null default now(),
- constraint valid_wedge_team_shots check (public.wedge_team_valid_shots(shots,min_yards,max_yards))
+ constraint valid_wedge_team_shots check (public.wedge_team_valid_shots(shots,min_yards,max_yards)),
+ constraint valid_wedge_team_range check (
+  (preset='30-75' and min_yards=30 and max_yards=75)
+  or (preset='50-90' and min_yards=50 and max_yards=90)
+  or (preset='90-135' and min_yards=90 and max_yards=135)
+  or preset='custom'
+ )
 );
 
 create index if not exists wedge_team_sessions_member_time
