@@ -1,5 +1,5 @@
-const CACHE='wedge-lab-liu-theme-v2';
-const FILES=['./','./index.html','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
+const CACHE='wedge-lab-liu-team-v3';
+const FILES=['./','./index.html','./manifest.webmanifest','./team.css','./team.js','./team-config.js','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim())});
 self.addEventListener('fetch',e=>{

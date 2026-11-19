@@ -25,3 +25,12 @@ IMPORTANT LIMITATIONS
 - Export/Import JSON allows manual transfer to another device.
 - The score is a screenshot-reconstructed DECADE-style metric: sum of 17 smallest 2D radial errors from 20 shots. It is not an official DECADE product or independently documented formula.
 - The data is not uploaded to GitHub Pages or to any server by this app.
+
+
+LIU TEAM MODE (INVITE-ONLY)
+- Team tab: email one-time-code sign-in, team leaderboard, selected player analytics, and team combine upload.
+- Team combines are opt-in, started from Team -> Start LIU team combine. Your existing personal sessions stay local and never auto-upload.
+- Live shared scores require a Supabase project. Read TEAM_MODE_SETUP.md. Until configured, the Team tab shows an honest setup message, not fake scores.
+- Approved golfers are managed in a PRIVATE Supabase allowlist; never put roster emails or database secrets into this public GitHub repository.
+- Server RLS lets approved players view team data, and each player modify only their own combines.
+- Team score calculation is performed server-side, but manually entered results remain honor-system based.
