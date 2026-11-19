@@ -92,7 +92,8 @@ alter table public.wedge_team_sessions enable row level security;
 -- No anonymous access, and no client-side membership editing.
 revoke all on public.wedge_team_members from anon, authenticated;
 revoke all on public.wedge_team_sessions from anon, authenticated;
-grant select on public.wedge_team_members to authenticated;
+-- Only share display names and IDs with teammates; emails stay private.
+grant select (id, display_name, active) on public.wedge_team_members to authenticated;
 grant select, insert, update, delete on public.wedge_team_sessions to authenticated;
 
 drop policy if exists "Active players may view LIU roster" on public.wedge_team_members;
