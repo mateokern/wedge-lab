@@ -43,8 +43,10 @@ Example client configuration:
 
 ## Rules and limitations
 
-The server calculates the DECADE-style score from 20 submitted shots (best 17 radial misses); users cannot send an arbitrary score. Shots are manually input and remain on the honor system. Presets 30–75, 50–90, and 90–135 are ranked separately; custom-range sessions are not ranked.
+The server calculates the DECADE-style score from 20 submitted shots (best 17 radial misses); users cannot send an arbitrary score. Shots are manually input and remain on the honor system. Presets 30–75, 50–90, 90–135, and 120–155 are ranked separately; custom-range sessions are not ranked.
 
 Do not delete/overwrite local records or change scoring without talking to the site owner. A full code backup branch exists: backup/pre-team-mode-2026-11-19. Your golf sessions live in local browser storage and are NOT backed up by a GitHub branch. Export JSON backups from each device regularly.
 
 Supabase email delivery has rate limits and may require SMTP configuration as the team grows.
+
+If Supabase Team Mode was previously set up, run supabase/migrations/20261121_add_120_155_preset.sql once in its SQL Editor before teammates upload 120–155 sessions. This updates range validation without deleting rows.
