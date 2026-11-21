@@ -70,7 +70,7 @@ create table if not exists public.wedge_team_sessions (
  id text primary key check (char_length(id) between 7 and 128),
  member_id uuid not null references public.wedge_team_members(id),
  played_at timestamptz not null default now(),
- preset text not null check (preset in ('30-75','50-90','90-135','custom')),
+ preset text not null check (preset in ('30-75','50-90','90-135','120-155','custom')),
  min_yards integer not null,
  max_yards integer not null,
  wind text not null default 'Unknown',
@@ -83,6 +83,7 @@ create table if not exists public.wedge_team_sessions (
   (preset='30-75' and min_yards=30 and max_yards=75)
   or (preset='50-90' and min_yards=50 and max_yards=90)
   or (preset='90-135' and min_yards=90 and max_yards=135)
+  or (preset='120-155' and min_yards=120 and max_yards=155)
   or preset='custom'
  )
 );

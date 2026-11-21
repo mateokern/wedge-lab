@@ -5,7 +5,7 @@
 'use strict';
 const cfg=window.WEDGE_TEAM_CONFIG||{};
 const AUTH_KEY='wedge-team-auth-v1';
-const ranges=[['30-75','30–75 yd'],['50-90','50–90 yd'],['90-135','90–135 yd']];
+const ranges=[['30-75','30–75 yd'],['50-90','50–90 yd'],['90-135','90–135 yd'],['120-155','120–155 yd']];
 const state={auth:null,member:null,members:[],sessions:[],range:'30-75',player:'all',
   email:'',notice:'',error:'',busy:false,loaded:false,refreshing:false};
 function configReady(){return /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(String(cfg.url||''))&&String(cfg.publishableKey||'').length>20;}
