@@ -2,7 +2,7 @@ WEDGE LAB — FIRST WORKING VERSION
 
 QUICK TEST
 - Open index.html in a desktop browser.
-- Select Practice > 30–75 yd (or 50–90, 90–135, Custom) > Start 20 shots.
+- Select Practice > 30–75 yd (or 50–90, 90–135, 120–155, Custom) > Start 20 shots.
 - Enter each FlightScope result manually (left/right/long/short or carry and offline).
 - Open Analysis and Sessions when you finish.
 - Settings > Import screenshot combine imports your supplied 90–135 yard round (71.0).
