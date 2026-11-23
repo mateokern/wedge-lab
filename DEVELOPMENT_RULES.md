@@ -18,3 +18,10 @@ Team Mode additional safeguards:
 - Never treat a teammate-name dropdown as sufficient access control. Keep verified-email allowlisting and server row-level security.
 - Never expose service-role credentials, roster emails, or personal auth tokens in this public repository.
 - Test team uploads, score edits, removal, denied access, and offline recovery before inviting the team.
+
+Personal cloud sync safeguards:
+- Preserve localStorage key wedge-lab-data-v1; keep JSON export and offline practice.
+- Do not automatically upload historical records without the golfer confirming account and device.
+- Cloud data is owner-scoped using Supabase RLS; never expose service-role keys.
+- Detect conflicting same-session edits instead of silently overwriting either version.
+- Never delete local or cloud records as a side effect of syncing.
