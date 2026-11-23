@@ -146,9 +146,38 @@ async function sendCode(){
  finally{state.busy=false;renderIfVisible();}
 }
 
+async function signInWithPassword(){
+ const email=String(document.getElementById('cloud-password-email')?.value||'').trim().toLowerCase();
+ const password=String(document.getElementById('cloud-password')?.value||'');
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||!password){note('Enter your email and password.',true);return;}
+ // Do not persist or log passwords. Only the secured Supabase Auth endpoint receives them.
+ const field=document.getElementById('cloud-password');if(field)field.value='';
+ state.busy=true;state.error='';renderIfVisible();
+ try{
+  const session=await api('/auth/v1/token?grant_type=password','POST',{email,password},false);
+  await completeSignIn(session);
+ }catch(e){note('Password sign-in failed: '+e.message,true);}
+ finally{state.busy=false;renderIfVisible();}
+}
+async function setPassword(){
+ if(!state.auth)return;
+ const password=String(document.getElementById('cloud-new-password')?.value||'');
+ const confirmation=String(document.getElementById('cloud-confirm-password')?.value||'');
+ if(password.length<12){note('Use a unique password with at least 12 characters.',true);return;}
+ if(password!==confirmation){note('The two passwords do not match.',true);return;}
+ const first=document.getElementById('cloud-new-password'),second=document.getElementById('cloud-confirm-password');
+ if(first)first.value='';if(second)second.value='';
+ state.busy=true;state.error='';renderIfVisible();
+ try{
+  const user=await api('/auth/v1/user','PUT',{password},true);
+  if(!user?.id)throw Error('Supabase did not confirm the password update.');
+  note('Password saved! You can now sign in on any device using your email and password.',false);
+ }catch(e){note('Could not set password: '+e.message+' If reauthentication is required, sign in again in Safari.',true);}
+ finally{state.busy=false;renderIfVisible();}
+}
 async function completeSignIn(result){
  if(!result?.access_token||!result?.refresh_token||!result?.user?.id||!result?.user?.email)
-  throw Error('The sign-in link did not return a valid account session.');
+  throw Error('The sign-in did not return a valid account session.');
  state.auth={access_token:result.access_token,refresh_token:result.refresh_token,user_id:result.user.id,
   email:result.user.email,expiresAt:Date.now()+(Number(result.expires_in)||3600)*1000};
  keepAuth();state.email='';
@@ -231,6 +260,19 @@ function render(){
     '<p class="hint">You can safely download existing cloud combines now. Enable upload when you are ready to back up this device’s completed sessions.</p>'+
     '<div class="inline"><button class="btn dark" data-cloud-action="enable">Enable sync on this device</button><button class="btn ghost" data-cloud-action="sync">↓ Check cloud</button><button class="btn ghost" data-cloud-action="signout">Sign out</button></div>');
  }
+ if(!state.auth){
+  body+='<div class="divider"></div><h3>Sign in with password</h3>'+
+    '<p class="hint">Already set a Wedge Lab password? Use it to sign in directly on your iPhone, iPad, or laptop without email links.</p>'+
+    '<div class="field"><label for="cloud-password-email">Email</label><input id="cloud-password-email" type="email" autocomplete="username" placeholder="your@email.com"></div>'+
+    '<div class="field" style="margin-top:10px"><label for="cloud-password">Password</label><input id="cloud-password" type="password" autocomplete="current-password"></div>'+
+    '<button class="btn dark" style="margin-top:12px" data-cloud-action="password-signin">Sign in with password</button>';
+ }else{
+  body+='<details style="margin-top:18px"><summary class="hint"><b>Set or change your sign-in password</b> (no custom SMTP required)</summary>'+
+    '<p class="hint" style="margin-top:10px">Set a unique password after signing in via an email link. Save it in your password manager to sign in easily on other devices.</p>'+
+    '<div class="field"><label for="cloud-new-password">New password (12+ characters)</label><input id="cloud-new-password" type="password" minlength="12" autocomplete="new-password"></div>'+
+    '<div class="field" style="margin-top:10px"><label for="cloud-confirm-password">Confirm new password</label><input id="cloud-confirm-password" type="password" minlength="12" autocomplete="new-password"></div>'+
+    '<button class="btn dark" style="margin-top:12px" data-cloud-action="set-password">Save password</button></details>';
+ }
  return '<div class="panel" style="margin-bottom:18px"><h2>☁️ Personal cloud sync</h2>'+body+
  (state.busy?'<p class="hint" role="status">Connecting…</p>':'')+
  (state.error?'<div class="notice error" role="alert" style="margin-top:12px">'+esc(state.error)+'</div>':'')+
@@ -239,6 +281,8 @@ function render(){
 }
 function action(name){
  if(state.busy)return;
+ if(name==='password-signin')return signInWithPassword();
+ if(name==='set-password')return setPassword();
  if(name==='send-code')return sendCode();
  if(name==='verify')return verify();
  if(name==='use-link')return verifyLink();
