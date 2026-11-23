@@ -130,9 +130,50 @@ ${ui.teamPlay?'<div class="notice" style="margin-bottom:16px"><b>🏆 LIU Team c
 ${ui.preset==='custom'?`<div class="formgrid" style="margin-bottom:20px"><div class="field"><label for="minRange">Minimum carry (yd)</label><input type="number" min="10" max="250" value="${ui.min}" id="minRange" data-config="min"></div><div class="field"><label for="maxRange">Maximum carry (yd)</label><input type="number" min="10" max="250" value="${ui.max}" id="maxRange" data-config="max"></div></div>`:''}
 <div class="configgrid"><div class="field"><label for="wind">Wind</label><select id="wind"><option>Calm / indoors</option><option>Light</option><option>Moderate</option><option>Strong</option></select></div><div class="field"><label for="surface">Surface</label><select id="surface"><option>Outdoor mat</option><option>Grass</option><option>Simulator</option><option>Other</option></select></div></div>
 <div class="field" style="margin-top:15px"><label for="sessionNotes">Session note (optional)</label><input id="sessionNotes" placeholder="E.g. FlightScope X3 aligned at the large tree, 42°F"></div>
-<div class="divider"></div><div class="inline" style="justify-content:space-between"><div class="hint">Your targets are randomly generated between the chosen distances, inclusive. Whole yards only.</div><button class="btn dark" data-action="create">Start 20 shots →</button></div></div>
+<div class="divider"></div><div class="inline" style="justify-content:space-between"><div class="hint">20 unique whole-yard targets, spread across the range, with at least a 10-yd jump between consecutive shots. Very narrow custom ranges may repeat or use smaller jumps.</div><button class="btn dark" data-action="create">Start 20 shots →</button></div></div>
 <div class="columns"><div class="notice">💡 <b>Scoring:</b> Each shot = √(left/right² + long/short²). Your 20-shot combine score is the total of your best 17 shots; your analysis keeps all 20.</div><div class="notice warn"><b>Best practice:</b> Set your FlightScope aim line to the same target line for the whole session. Use carry distance, not total distance.</div></div>`}
-function genTargets(min,max){const arr=[];const spread=max-min;for(let i=0;i<20;i++){const b=i%5;const lo=min+Math.floor(spread*b/5);const hi=Math.min(max,min+Math.floor(spread*(b+1)/5));arr.push(lo+Math.floor(Math.random()*(hi-lo+1)));}for(let i=arr.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function genTargets(min,max){
+ const n=20,span=max-min+1;
+ // Normal combine ranges: 20 distinct yardages, four from each of five
+ // distance bands, and at least 10 yd between consecutive shot targets.
+ // Narrow custom ranges relax the gap; spans under 20 must repeat some yardages.
+ const gap=span>=30?10:span>=20?Math.max(1,Math.floor(span/4)):span>1?1:0;
+ const shuffle=a=>{for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+ let pool=[];
+ for(let attempt=0;attempt<10;attempt++){
+  pool=[];
+  if(span>=n){
+   for(let band=0;band<5;band++){
+    const lo=min+Math.floor(band*span/5),hi=min+Math.floor((band+1)*span/5)-1;
+    pool.push(...shuffle(Array.from({length:hi-lo+1},(_,i)=>lo+i)).slice(0,4));
+   }
+  }else pool=shuffle(Array.from({length:n},(_,i)=>min+(i%span)));
+  const path=[],used=new Array(n).fill(false);let visited=0;
+  function visit(last){
+   if(path.length===n)return true;
+   if(++visited>2500)return false;
+   const candidates=[];
+   for(let i=0;i<n;i++)if(!used[i]&&(last<0||Math.abs(pool[i]-pool[last])>=gap))candidates.push(i);
+   shuffle(candidates);
+   // Use constrained targets first so late shots don't get stuck nearby.
+   const degree=new Array(n).fill(0);
+   for(const i of candidates)for(let j=0;j<n;j++)if(!used[j]&&j!==i&&Math.abs(pool[j]-pool[i])>=gap)degree[i]++;
+   candidates.sort((a,b)=>degree[a]-degree[b]);
+   for(const i of candidates){path.push(i);used[i]=true;if(visit(i))return true;path.pop();used[i]=false;}
+   return false;
+  }
+  if(visit(-1))return path.map(i=>pool[i]);
+ }
+ // Only a last-resort fallback for impractically narrow custom ranges.
+ // Never discard a sampled target and never change saved sessions.
+ let best=shuffle(pool.slice()),bestGap=-1;
+ for(let i=0;i<120;i++){
+  const order=shuffle(pool.slice());
+  const smallest=Math.min(...order.slice(1).map((v,j)=>Math.abs(v-order[j])));
+  if(smallest>bestGap){best=order;bestGap=smallest;}
+ }
+ return best;
+}
 function begin(){let min=ui.preset==='30-75'?30:ui.preset==='50-90'?50:ui.preset==='90-135'?90:ui.preset==='120-155'?120:Number(document.querySelector('[data-config="min"]')?.value);let max=ui.preset==='30-75'?75:ui.preset==='50-90'?90:ui.preset==='90-135'?135:ui.preset==='120-155'?155:Number(document.querySelector('[data-config="max"]')?.value);if(!Number.isInteger(min)||!Number.isInteger(max)||min<10||max>250||min>=max){alert('Choose valid whole-yard limits, between 10 and 250, with minimum less than maximum.');return}if(data.draft&&!confirm('Replace the unfinished combine? It will be lost.'))return;if(ui.teamPlay&&!WedgeTeam.member()){alert('Sign in to LIU Team Mode to record a team combine.');return;}data.draft={id:randId(),createdAt:new Date().toISOString(),preset:ui.preset,min,max,targets:genTargets(min,max),shots:[],ball:'Mixed premium',wind:document.getElementById('wind')?.value||'Calm / indoors',surface:document.getElementById('surface')?.value||'Outdoor mat',notes:document.getElementById('sessionNotes')?.value||'',teamMemberId:ui.teamPlay?WedgeTeam.member().id:null,teamSyncStatus:ui.teamPlay?'pending':null};persist();ui.shotIndex=0;ui.mode='offsets';setFormForIndex(0);go('practice')}
 function setFormForIndex(i){const d=data.draft,existing=d?.shots[i];formCache=existing?{left:String(existing.left),right:String(existing.right),long:String(existing.long),short:String(existing.short),club:existing.club||'Unspecified',carry:'',offline:'',offlineDir:'R'}:{left:'',right:'',long:'',short:'',club:d?.shots[i-1]?.club||'Unspecified',carry:'',offline:'',offlineDir:'R'};ui.mode='offsets';ui.clubPickerOpen=false}
 function renderPractice(){const d=data.draft;if(!d)return renderStart();let i=ui.shotIndex,target=d.targets[i],rs=stats(d.shots);const clubList=practiceClubs();return `<div class="eyebrow">LIVE SESSION · ${esc(namePreset(d.preset,d.min,d.max))}</div><div class="panelhead"><div><h1 style="margin-bottom:4px">Shot ${i+1} <span style="color:#8CABC1">/ 20</span></h1><div class="hint">${esc(d.wind)} · ${esc(d.surface)}</div></div><button class="btn ghost tinybtn" data-go="home">Save & exit</button></div>
