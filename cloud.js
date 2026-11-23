@@ -141,8 +141,55 @@ async function sendCode(){
  const email=String(document.getElementById('cloud-email')?.value||'').trim().toLowerCase();
  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){note('Enter a valid email.',true);return;}
  state.busy=true;renderIfVisible();
- try{await api('/auth/v1/otp','POST',{email,create_user:true},false);state.email=email;note('Check your email for the one-time sign-in code.',false);}
+ try{await api('/auth/v1/otp','POST',{email,create_user:true},false);state.email=email;note('Check your inbox for a secure sign-in link. If using the iPhone Home Screen app, copy the link from the email and paste it here without opening it.',false);}
  catch(e){note(e.message,true);}
+ finally{state.busy=false;renderIfVisible();}
+}
+
+async function completeSignIn(result){
+ if(!result?.access_token||!result?.refresh_token||!result?.user?.id||!result?.user?.email)
+  throw Error('The sign-in link did not return a valid account session.');
+ state.auth={access_token:result.access_token,refresh_token:result.refresh_token,user_id:result.user.id,
+  email:result.user.email,expiresAt:Date.now()+(Number(result.expires_in)||3600)*1000};
+ keepAuth();state.email='';
+ note('Signed in successfully. Your local sessions are still safe. Review the account before enabling uploads.',false);
+ await doSync(false); // Download only: never upload local personal history automatically.
+}
+function parseSignInLink(raw){
+ let link;try{link=new URL(String(raw||'').trim());}catch(e){throw Error('Paste the complete link from your Supabase email.');}
+ if(link.protocol!=='https:'||link.origin!==new URL(c.url).origin||link.pathname!=='/auth/v1/verify')
+  throw Error('That is not a Wedge Lab Supabase sign-in link. Use the full link from your email.');
+ const tokenHash=link.searchParams.get('token')||link.searchParams.get('token_hash');
+ const type=link.searchParams.get('type');
+ if(!tokenHash||tokenHash.length<16||tokenHash.length>2048||!['magiclink','signup','email'].includes(type))
+  throw Error('This email link is missing a valid sign-in token or type.');
+ return {token_hash:tokenHash,type};
+}
+async function verifyLink(){
+ const pasted=document.getElementById('cloud-link')?.value||'';
+ let parsed;try{parsed=parseSignInLink(pasted);}catch(e){note(e.message,true);return;}
+ state.busy=true;renderIfVisible();
+ try{
+  const result=await api('/auth/v1/verify','POST',parsed,false);
+  await completeSignIn(result);
+ }catch(e){note('This link could not sign you in: '+e.message+' Request a new email link if it expired or was already opened.',true);}
+ finally{state.busy=false;renderIfVisible();}
+}
+async function acceptRedirect(){
+ if(!ready()||!window.location?.hash)return false;
+ const hash=window.location.hash.replace(/^#/,'');
+ const params=new URLSearchParams(hash);
+ if(!params.has('access_token')||!params.has('refresh_token'))return false;
+ const access_token=params.get('access_token'),refresh_token=params.get('refresh_token');
+ const expires_in=Number(params.get('expires_in'))||3600;
+ // Clear sensitive tokens from the visible URL and navigation history immediately.
+ if(window.history?.replaceState)window.history.replaceState(null,'',window.location.pathname+window.location.search);
+ state.busy=true;renderIfVisible();
+ try{
+  const user=await api('/auth/v1/user','GET',null,false,{'Authorization':'Bearer '+access_token});
+  await completeSignIn({access_token,refresh_token,expires_in,user});
+  return true;
+ }catch(e){note('Email sign-in did not finish: '+e.message+' You can request another link.',true);return false;}
  finally{state.busy=false;renderIfVisible();}
 }
 async function verify(){
@@ -151,12 +198,7 @@ async function verify(){
  state.busy=true;renderIfVisible();
  try{
   const result=await api('/auth/v1/verify','POST',{email:state.email,token:pin,type:'email'},false);
-  if(!result?.access_token||!result?.refresh_token||!result?.user?.id)throw Error('Email verification could not be completed.');
-  state.auth={access_token:result.access_token,refresh_token:result.refresh_token,user_id:result.user.id,
-   email:result.user.email||state.email,expiresAt:Date.now()+(Number(result.expires_in)||3600)*1000};
-  keepAuth();state.email='';
-  note('Signed in. Your local sessions have not been uploaded yet.',false);
-  await doSync(false); // Safe pull only until user explicitly enables uploads.
+  await completeSignIn(result);
  }catch(e){note(e.message,true)}
  finally{state.busy=false;renderIfVisible();}
 }
@@ -175,10 +217,13 @@ function render(){
  let body='';
  if(!state.auth){
   body='<p class="hint">Use the same email on your iPhone, iPad, and laptop. Your combines stay private.</p>'+
-  (state.email?'<div class="field"><label>Code sent to '+esc(state.email)+'</label><input id="cloud-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="6-digit code"></div>'+
-    '<div class="inline" style="margin-top:12px"><button class="btn dark" data-cloud-action="verify">Verify code</button><button class="btn ghost" data-cloud-action="other-email">Different email</button></div>':
+  (state.email?'<div class="notice" style="margin-bottom:12px"><b>Link sent to '+esc(state.email)+'.</b> On iPhone Home Screen, long-press the sign-in button in the email, tap <b>Copy Link</b>, then paste below without opening it. This keeps your original saved combines in the app.</div>'+
+   '<div class="field"><label for="cloud-link">Paste the sign-in link from your email</label><textarea id="cloud-link" rows="3" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="https://…supabase.co/auth/v1/verify?token=…"></textarea></div>'+
+   '<div class="inline" style="margin-top:12px"><button class="btn dark" data-cloud-action="use-link">Sign in with copied link</button><button class="btn ghost" data-cloud-action="other-email">Use another email</button></div>'+
+   '<details style="margin-top:15px"><summary class="hint">Have a numeric code instead?</summary><div class="field" style="margin-top:10px"><label for="cloud-code">Email verification code</label><input id="cloud-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="6-digit code"></div><button class="btn ghost" style="margin-top:8px" data-cloud-action="verify">Verify code</button></details>':
    '<div class="field"><label>Your email</label><input id="cloud-email" type="email" autocomplete="email" placeholder="your@email.com"></div>'+
-    '<button class="btn dark" style="margin-top:12px" data-cloud-action="send-code">Email sign-in code →</button>');
+    '<button class="btn dark" style="margin-top:12px" data-cloud-action="send-code">Email sign-in link →</button>'+
+    '<p class="footnote">Uses Supabase’s default email links; no custom SMTP template is required. On a desktop browser you can also click the email link if the Supabase redirect is configured.</p>');
  }else{
   body='<p class="hint">Signed in as <b>'+esc(state.auth.email)+'</b> · '+n+' completed combines on this device.</p>'+
    (meta.enabled?'<div class="notice">✓ Automatic personal syncing enabled for this device. Your history stays local too.</div>'+
@@ -196,6 +241,7 @@ function action(name){
  if(state.busy)return;
  if(name==='send-code')return sendCode();
  if(name==='verify')return verify();
+ if(name==='use-link')return verifyLink();
  if(name==='other-email'){state.email='';note('',false);return}
  if(name==='enable')return enable();
  if(name==='sync')return doSync(readMeta().enabled);
@@ -203,6 +249,7 @@ function action(name){
 }
 async function init(){
  restoreAuth();
+ if(await acceptRedirect())return;
  if(state.auth){await doSync(readMeta().enabled);}
 }
 if(typeof window.addEventListener==='function'){
