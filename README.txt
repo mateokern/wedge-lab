@@ -48,3 +48,10 @@ EDIT ALL SHOTS LOGGED WITH THE WRONG CLUB
 - Only shots originally logged with the selected club change; other clubs, coordinates, targets, scoring and saved combines are untouched.
 - Historical shot data remains on the device where it was recorded; updating the website does not directly edit a device's local session.
 - Previous one-shot Edit controls are still available. Team combines will resync their corrected records when a private team backend is configured and online.
+
+SPREAD-OUT RANDOM TARGETS (NOV 2026)
+- Standard 20-shot combines now use 20 different whole-yard targets, balanced across five equal-distance bands (four targets per band).
+- Consecutive shots are at least 10 yards apart, so a 60 yd shot cannot immediately be followed by 61, 63, or 69 yd.
+- Custom ranges narrower than 30 yards relax the minimum gap. Custom ranges containing fewer than 20 whole-yard values necessarily repeat yardages.
+- This only affects newly started combines. Existing finished sessions, shot coordinates, scores, and unfinished target sequences are never regenerated.
+- Different target ordering/coverage can affect difficulty. Compare long-term scores with that training-protocol change in mind.
