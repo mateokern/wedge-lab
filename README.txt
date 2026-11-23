@@ -41,3 +41,10 @@ LARGE CLUB PICKER (IPHONE FRIENDLY)
 - Existing saved starter bags are presented as these five choices without changing the underlying saved bag or historical shot records.
 - If you have customized your bag, your saved custom choices remain available. Settings > My bag controls future practice choices; saving a new bag does not alter previous shot records.
 - Existing incomplete combines keep their selected club when resumed; the new selector does not discard their values.
+
+EDIT ALL SHOTS LOGGED WITH THE WRONG CLUB
+- From Sessions, tap Report on a completed combine and select Change clubs for this session.
+- Choose the original club (for example 54°) and the correct club (58°), then confirm.
+- Only shots originally logged with the selected club change; other clubs, coordinates, targets, scoring and saved combines are untouched.
+- Historical shot data remains on the device where it was recorded; updating the website does not directly edit a device's local session.
+- Previous one-shot Edit controls are still available. Team combines will resync their corrected records when a private team backend is configured and online.
