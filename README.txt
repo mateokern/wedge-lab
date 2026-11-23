@@ -62,3 +62,11 @@ PERSONAL CROSS-DEVICE CLOUD SYNC (OPTIONAL)
 - Completed sessions sync; drafts remain local. LocalStorage storage key/scoring unchanged. Cloud conflict detection prevents blind overwrites.
 - The cloud database uses owner-only RLS. New Supabase Free projects use default magic-link emails; on iPhone Home Screen, copy and paste the emailed link into Settings > Personal cloud sync. No SMTP template editing required for the owner's sign-in. See PERSONAL_CLOUD_SETUP.md.
 - Export JSON backups before and after first sync; do not delete iPhone app data.
+
+PERSONAL CLOUD SYNC · PASSWORD SIGN-IN
+- The existing Supabase magic-link sign-in remains available for first-time verification.
+- A signed-in user can set their own password in Settings > Personal cloud sync > Set or change your sign-in password.
+- After this, email + password sign-in works directly inside the installed iPhone/iPad Home Screen app and desktop, without changing the email template or configuring custom SMTP.
+- Use at least 12 unique characters and a password manager. Passwords are submitted only over HTTPS to Supabase Auth, never added to local session backups.
+- Local Wedge Lab sessions, drafts, storage keys, and confirmation-before-upload remain unchanged.
+- If Safari is already signed in following an emailed link, set the password there first, then use password sign-in inside the iPhone installed app.
