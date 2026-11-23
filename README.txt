@@ -60,5 +60,5 @@ PERSONAL CROSS-DEVICE CLOUD SYNC (OPTIONAL)
 - Open Settings > Personal cloud sync. One email account syncs completed combines across iPhone, iPad, and desktop.
 - Verify email code, then explicitly enable uploads on the device with existing saved rounds. Other devices download that history safely.
 - Completed sessions sync; drafts remain local. LocalStorage storage key/scoring unchanged. Cloud conflict detection prevents blind overwrites.
-- The cloud database uses owner-only RLS. Supabase email OTP templates need {{ .Token }}. See PERSONAL_CLOUD_SETUP.md.
+- The cloud database uses owner-only RLS. New Supabase Free projects use default magic-link emails; on iPhone Home Screen, copy and paste the emailed link into Settings > Personal cloud sync. No SMTP template editing required for the owner's sign-in. See PERSONAL_CLOUD_SETUP.md.
 - Export JSON backups before and after first sync; do not delete iPhone app data.
