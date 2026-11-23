@@ -7,7 +7,7 @@ const c=window.WEDGE_CLOUD_CONFIG||{};
 const AUTH_STORE='wedge-cloud-auth-v1', META_PREFIX='wedge-cloud-meta-v1:';
 const state={auth:null,email:'',status:'',error:'',busy:false,working:false,scheduled:null,conflicts:[],lastSync:null};
 const ready=()=>/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(c.url||'')&&String(c.publishableKey||'').startsWith('sb_publishable_');
-function renderIfVisible(){if(typeof ui!=='undefined'&&ui.view==='settings')render();}
+function renderIfVisible(){if(typeof ui!=='undefined'&&ui.view==='settings'&&typeof window.render==='function')window.render();}
 function note(message,error){state.status=error?'':message;state.error=error?message:'';renderIfVisible();}
 function readMeta(){const id=state.auth?.user_id;if(!id)return {enabled:false,items:{}};try{let value=JSON.parse(localStorage.getItem(META_PREFIX+id));if(value&&value.items&&typeof value.items==='object')return value;}catch(e){}return {enabled:false,items:{}};}
 function saveMeta(meta){if(!state.auth)return;try{localStorage.setItem(META_PREFIX+state.auth.user_id,JSON.stringify(meta));}catch(e){note('Sync settings could not be saved on this device. Keep your JSON backup.',true);}}
