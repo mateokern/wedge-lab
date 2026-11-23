@@ -34,3 +34,10 @@ LIU TEAM MODE (INVITE-ONLY)
 - Approved golfers are managed in a PRIVATE Supabase allowlist; never put roster emails or database secrets into this public GitHub repository.
 - Server RLS lets approved players view team data, and each player modify only their own combines.
 - Team score calculation is performed server-side, but manually entered results remain honor-system based.
+
+LARGE CLUB PICKER (IPHONE FRIENDLY)
+- New sessions show a large grey touch-friendly club chooser rather than the native iPhone dropdown.
+- The five standard practice options are 58°, 54°, 50°, 46° PW, and 9 iron.
+- Existing saved starter bags are presented as these five choices without changing the underlying saved bag or historical shot records.
+- If you have customized your bag, your saved custom choices remain available. Settings > My bag controls future practice choices; saving a new bag does not alter previous shot records.
+- Existing incomplete combines keep their selected club when resumed; the new selector does not discard their values.
