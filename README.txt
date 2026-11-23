@@ -55,3 +55,10 @@ SPREAD-OUT RANDOM TARGETS (NOV 2026)
 - Custom ranges narrower than 30 yards relax the minimum gap. Custom ranges containing fewer than 20 whole-yard values necessarily repeat yardages.
 - This only affects newly started combines. Existing finished sessions, shot coordinates, scores, and unfinished target sequences are never regenerated.
 - Different target ordering/coverage can affect difficulty. Compare long-term scores with that training-protocol change in mind.
+
+PERSONAL CROSS-DEVICE CLOUD SYNC (OPTIONAL)
+- Open Settings > Personal cloud sync. One email account syncs completed combines across iPhone, iPad, and desktop.
+- Verify email code, then explicitly enable uploads on the device with existing saved rounds. Other devices download that history safely.
+- Completed sessions sync; drafts remain local. LocalStorage storage key/scoring unchanged. Cloud conflict detection prevents blind overwrites.
+- The cloud database uses owner-only RLS. Supabase email OTP templates need {{ .Token }}. See PERSONAL_CLOUD_SETUP.md.
+- Export JSON backups before and after first sync; do not delete iPhone app data.
