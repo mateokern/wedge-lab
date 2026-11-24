@@ -70,3 +70,10 @@ PERSONAL CLOUD SYNC · PASSWORD SIGN-IN
 - Use at least 12 unique characters and a password manager. Passwords are submitted only over HTTPS to Supabase Auth, never added to local session backups.
 - Local Wedge Lab sessions, drafts, storage keys, and confirmation-before-upload remain unchanged.
 - If Safari is already signed in following an emailed link, set the password there first, then use password sign-in inside the iPhone installed app.
+
+PERSONAL PERFORMANCE UPDATE
+- Analysis contains personal bests and rolling-five score charts separately for each of the four fixed ranges. Mixed-range accuracy charts use mean per-shot percentage error (rough normalization, not a validated difficulty model). Individual-range accuracy remains in yards.
+- Session ratings compare the current score only to its previous 3–5 completed comparable sessions: green at least 10% better, yellow within the thresholds, red more than 10% worse; grey without sufficient history. Custom ranges match exact limits. Ladder scores are separate. Personal bests compare against earlier dated records.
+- Side-by-side club comparison uses the same 10-yard target bucket and common plot scale; small sample sizes are flagged.
+- Wedge Ladder: personal training only, 20 shots, 30 up to 155 and back to 30, four planned shots each with 58°, 54°, 50°, PW, 9 iron, suggested clubs can be changed. Ladder records retain original 17-of-20 scoring but are separate from standard combine progress/leaderboards. Completed ladder records use existing private cloud sync and JSON backups; unfinished drafts remain local. Update all devices before starting a ladder so old clients don't classify it as custom.
+- No database schema changes, no historical data migration, no change to classic scoring. The weakness heatmap was not selected in the final approval and is not implemented in this release.
