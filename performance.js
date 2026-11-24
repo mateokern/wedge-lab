@@ -30,9 +30,11 @@ function ratingHTML(s,detail=false){
 }
 function perfScoreChart(sessions){
  const all=sessions.slice(-20),v=all.map(s=>combineScore(s.shots));if(!v.length)return '<div class="hint perf-nochart">No sessions yet</div>';
- const W=300,H=108,p=20,min=Math.max(0,Math.min(...v)-Math.max(2,(Math.max(...v)-Math.min(...v))*.15)),max=Math.max(...v)+Math.max(2,(Math.max(...v)-Math.min(...v))*.15);
+ const full=sessions.map(s=>combineScore(s.shots)),offset=full.length-v.length;
+ const rolling=v.map((_,i)=>mean(full.slice(Math.max(0,offset+i-4),offset+i+1)));
+ const values=[...v,...rolling],low=Math.min(...values),high=Math.max(...values),pad=Math.max(2,(high-low)*.15);
+ const W=300,H=108,p=20,min=Math.max(0,low-pad),max=high+pad;
  const x=i=>v.length===1?W/2:p+(W-2*p)*i/(v.length-1),y=z=>H-p-(z-min)/(max-min||1)*(H-2*p);
- const rolling=v.map((_,i)=>mean(v.slice(Math.max(0,i-4),i+1)));
  return '<svg class="perf-chart" viewBox="0 0 300 108" role="img" aria-label="Combine scores, chronological, lower is better"><path d="M20 20H280 M20 54H280 M20 88H280" stroke="#b5d3e2" stroke-opacity=".65" fill="none"/><text x="2" y="15" font-size="9" fill="currentColor">'+fmt(max,0)+'</text><text x="2" y="102" font-size="9" fill="currentColor">'+fmt(min,0)+'</text><polyline points="'+rolling.map((z,i)=>x(i)+','+y(z)).join(' ')+'" fill="none" stroke="#D6A53D" stroke-dasharray="5 3" stroke-width="2"/><polyline points="'+v.map((z,i)=>x(i)+','+y(z)).join(' ')+'" fill="none" stroke="#3189B6" stroke-width="2.5"/>'+v.map((z,i)=>'<circle cx="'+x(i)+'" cy="'+y(z)+'" r="3.7" fill="#3189B6"><title>'+esc(formatDate(all[i].completedAt))+' · '+fmt(z)+'</title></circle>').join('')+'</svg>';
 }
 function performanceDashboard(){
