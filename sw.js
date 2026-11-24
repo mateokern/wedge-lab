@@ -1,4 +1,4 @@
-const CACHE='wedge-lab-performance-ladder-v10';
+const CACHE='wedge-lab-broad-club-compare-v11';
 const FILES=['./','./index.html','./manifest.webmanifest','./cloud-config.js','./cloud.js','./performance.js','./team.css','./team.js','./team-config.js','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim())});
