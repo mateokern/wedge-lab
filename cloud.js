@@ -36,7 +36,8 @@ function snapshot(s){
  return JSON.stringify({
   id:s.id,createdAt:s.createdAt??null,completedAt:s.completedAt??null,preset:s.preset,min:s.min,max:s.max,
   shots:(s.shots||[]).map(x=>({index:x.index,target:x.target,club:x.club||'Unspecified',left:x.left,right:x.right,long:x.long,short:x.short})),
-  ball:s.ball||'',wind:s.wind||'',surface:s.surface||'',notes:s.notes||''
+  ball:s.ball||'',wind:s.wind||'',surface:s.surface||'',notes:s.notes||'',
+  ...(s.preset==='ladder'&&Array.isArray(s.ladderClubs)?{ladderClubs:s.ladderClubs}:{})
  });
 }
 function eligible(s){return s&&typeof s.id==='string'&&s.id.length>=3&&Array.isArray(s.shots)&&s.shots.length===20&&!s.id.startsWith('cloud-conflict-');}
