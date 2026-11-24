@@ -77,3 +77,8 @@ PERSONAL PERFORMANCE UPDATE
 - Side-by-side club comparison uses the same 10-yard target bucket and common plot scale; small sample sizes are flagged.
 - Wedge Ladder: personal training only, 20 shots, 30 up to 155 and back to 30, four planned shots each with 58°, 54°, 50°, PW, 9 iron, suggested clubs can be changed. Ladder records retain original 17-of-20 scoring but are separate from standard combine progress/leaderboards. Completed ladder records use existing private cloud sync and JSON backups; unfinished drafts remain local. Update all devices before starting a ladder so old clients don't classify it as custom.
 - No database schema changes, no historical data migration, no change to classic scoring. The weakness heatmap was not selected in the final approval and is not implemented in this release.
+
+CLUB COMPARISON RANGE UPDATE
+- Select Inside 100 yd (strictly under 100), any standard combine's target limits, all distances, or the original 10-yard buckets. Broad options filter by individual shot target, not by the combine preset; ladder training remains separate.
+- Both raw dispersion plots use the same scale. Mean target distance is shown for each club. Matched-distance averages use equal weights across shared 10-yard buckets with at least 3 shots per club in each bucket. This reduces distance-mix bias but does not establish a controlled test; small samples and different conditions remain limitations.
+- No changes to records, score logic, cloud syncing, or team permissions.
